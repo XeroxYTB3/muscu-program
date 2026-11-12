@@ -97,6 +97,20 @@ input[type=time]{font-size:17px;font-weight:800;padding:5px 8px;border-radius:10
 .fin .tro{animation:tro 1.2s ease-in-out infinite alternate}@keyframes tro{from{transform:rotate(-8deg) scale(1)}to{transform:rotate(8deg) scale(1.12)}}
 .cf{position:absolute;top:-30px;width:10px;height:16px;border:2px solid var(--ink);animation:fall linear infinite}@keyframes fall{to{transform:translateY(115vh) rotate(720deg)}}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-iteration-count:1!important}}
+
+:root{--bg:#f6f3ea;--ink:#16161d;--y:#ffd23f;--o:#ff6b4a;--g:#6fe3a3;--b:#a8bcff}
+.box{border-width:2.5px;border-radius:22px;box-shadow:0 5px 0 var(--ink)}
+.btn{border-radius:20px;background:linear-gradient(#ffe370,var(--y))}.btn.sm{background:#fff}.btn.sm.k{background:var(--ink)}
+.tabs{background:#fff;border:2.5px solid var(--ink);border-radius:26px;padding:6px;margin-bottom:calc(8px + env(safe-area-inset-bottom,0px));box-shadow:0 4px 0 var(--ink)}
+.tabs button{border:0;box-shadow:none;border-radius:20px;background:transparent}.tabs button:active{transform:scale(.94)}.tabs .on{background:var(--y)}
+.mst{background:radial-gradient(circle at 50% 120%,#ffe08a,#fff 72%)}.mas{overflow:visible}
+.mb{transform-origin:110px 134px;animation:mb 1.6s ease-in-out infinite}@keyframes mb{50%{transform:scale(1.04,.95)}}
+.ma{transform-origin:146px 88px;animation:ma 1.6s ease-in-out infinite}@keyframes ma{0%,100%{transform:rotate(8deg)}50%{transform:rotate(-38deg)}}
+.ey{transform-origin:110px 83px;animation:bl 4s infinite}@keyframes bl{94%,100%{transform:scaleY(.1)}}
+.bub{position:absolute;right:10px;top:10px;max-width:46%;background:#fff;border:2.5px solid var(--ink);border-radius:16px 16px 4px 16px;padding:6px 10px;font-size:13px;font-weight:800;line-height:1.2}
+.sv .stage{background:linear-gradient(#fff,#fff4c2);border:2.5px solid var(--ink);border-radius:26px;overflow:hidden}.nav.l{left:8px}.nav.r{right:8px}
+.wt{display:flex;align-items:center;gap:10px}.wt button{width:38px;height:38px;border-radius:50%;border:2.5px solid var(--ink);background:#fff;font-weight:900;font-size:22px;line-height:1;box-shadow:0 3px 0 var(--ink)}.wt button:active{transform:translateY(3px);box-shadow:none}.wt b{min-width:62px;text-align:center;font-size:17px}.wt small{opacity:.6}
+.pill{background:var(--o);color:#fff}.dt{border-radius:50%}
 </style></head><body>
 <div id="app"></div><div id="ss"></div>
 <script>
@@ -141,7 +155,7 @@ for(const k in M)M[k].k=M[k].k.map(N);
 
 function pose(m,ms){const k=m.k,n=k.length;let u=ms/1000/m.T%1,s;
  if(m.c)s=u*(n-1);else{let x=u<.5?u*2:2-u*2;x=Math.min(1,Math.max(0,(x-.12)/.76));s=x*(n-1)}
- const i=Math.min(Math.floor(s),n-2);let f=s-i;if(!m.l)f=f*f*(3-2*f);
+ const i=Math.max(0,Math.min(Math.floor(s)||0,n-2));let f=s-i;if(!m.l)f=f*f*(3-2*f);
  return k[i].map((v,j)=>v+(k[i+1][j]-v)*f)}
 
 function draw(q,m){
@@ -163,7 +177,7 @@ function draw(q,m){
  return `<g fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round">${e}<g opacity=".4" stroke-width="5">${pl(a2)}${pl(l2)}</g><g stroke-width="6.5">${pl([hp,nk])}${pl(l1)}${pl(a1)}</g><circle cx="${(hd[0]+dx).toFixed(1)}" cy="${(hd[1]+dy).toFixed(1)}" r="${L.hd}" fill="#fff" stroke-width="5"/>${m.d?D(a1,1):''}${m.d==1?D(a2,.4):''}</g>`}
 
 let cur=null,T0=0;
-function frame(ms){const el=document.getElementById('fg');if(el&&cur)el.innerHTML=draw(pose(cur,ms-T0),cur);requestAnimationFrame(frame)}
+function frame(){requestAnimationFrame(frame);try{const el=document.getElementById('fg');if(el&&cur)el.innerHTML=draw(pose(cur,Math.max(0,performance.now()-T0)),cur)}catch(e){}}
 
 /* ---------- programme (nom, séries, reps, conseil, animation) ---------- */
 const DAYS=["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"],SH=["D","L","M","M","J","V","S"];
@@ -178,7 +192,7 @@ const P={
 };
 
 /* ---------- état ---------- */
-let S={done:{},sets:{},remind:"20:00",notified:""},tab="home",Q=null,fresh=1,rest_iv,lastDue=null;
+let S={w:{},done:{},sets:{},remind:"20:00",notified:""},tab="home",Q=null,fresh=1,rest_iv,lastDue=null;
 try{const s=localStorage.getItem("muscu");if(s)S=Object.assign(S,JSON.parse(s))}catch(e){}
 const save=()=>{try{localStorage.setItem("muscu",JSON.stringify(S))}catch(e){}};
 const $=id=>document.getElementById(id);
@@ -199,6 +213,8 @@ const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
 const F=()=>{const r=fresh?"in":"";fresh=0;return r};
 const dateStr=()=>{const n=today();return cap(n.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"}))+" · "+n.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})};
 
+const LOAD=["curl","fp","gob","row","ohp","lat","tri","rdl","wr"],gw=e=>S.w[e[0]]??5,dur=e=>{const m=/^(\d+)\s*s(\b|$)/.exec(e[2]);return m?+m[1]:0};
+function wt(d){const e=P[Q.dow].ex[Q.i];S.w[e[0]]=Math.max(0,gw(e)+d);save();render()}
 /* ---------- rappels ---------- */
 function setRemind(v){S.remind=v;S.notified="";save();render()}
 function notify(t,b){try{navigator.serviceWorker.ready.then(r=>r.showNotification(t,{body:b,icon:"icon-192.png",badge:"icon-192.png",tag:"muscu-"+key(today())}))}catch(e){try{new Notification(t,{body:b})}catch(_){}}}
@@ -218,6 +234,7 @@ function start(dow,k){const p=P[dow];let i=0;for(;i<p.ex.length;i++)if(exSets(k,
 function quit(){stopRest();Q=null;fresh=1;tab="home";render()}
 function go(d){const n=P[Q.dow].ex.length;Q.i=Math.max(0,Math.min(n-1,Q.i+d));Q.an=1;render()}
 function setDone(){const p=P[Q.dow],e=p.ex[Q.i],last=Q.i==p.ex.length-1,a=S.sets[Q.k]||(S.sets[Q.k]=[]),c=a[Q.i]||0;
+ if(dur(e)&&c<e[1]&&!Q.tm){Q.tm=1;return startRest(dur(e))}Q.tm=0;
  if(c>=e[1]){if(last)return endSess();return go(1)}
  a[Q.i]=c+1;save();
  if(c+1>=e[1]){if(last)return endSess();if(e[1]==1||Q.dow==0)return go(1);Q.nx=1;return startRest(90)}
@@ -227,34 +244,35 @@ function undo(){delete S.done[key(today())];save();render()}
 function startRest(s){stopRest();Q.rest=s;Q.rt=s;render();rest_iv=setInterval(()=>{Q.rest--;if(Q.rest<=0)endRest();else rupd()},1000)}
 function rupd(){const r=$("rn");if(r)r.textContent=Q.rest;const c=$("rc");if(c)c.style.strokeDashoffset=(1-Q.rest/Q.rt)*339}
 function addR(){Q.rest+=15;Q.rt+=15;rupd()}
-function endRest(){stopRest();Q.rest=0;if(Q.nx){Q.nx=0;Q.i++;Q.an=1}render();try{navigator.vibrate&&navigator.vibrate(200)}catch(e){}}
+function endRest(){if(Q.tm){stopRest();Q.rest=0;try{navigator.vibrate(200)}catch(e){}return setDone()}stopRest();Q.rest=0;if(Q.nx){Q.nx=0;Q.i++;Q.an=1}render();try{navigator.vibrate&&navigator.vibrate(200)}catch(e){}}
 function stopRest(){clearInterval(rest_iv)}
 
 function sess(){const p=P[Q.dow],e=p.ex[Q.i],n=p.ex.length,c=Math.min(exSets(Q.k,Q.i),e[1]),f=c>=e[1],last=Q.i==n-1,an=Q.an?"sl":"";Q.an=0;
  setCur(M[e[4]]);
  let h=`<div class="sv"><div class="top"><button class="x" onclick="quit()">${I("x",20)}</button><div class="seg">${p.ex.map((x,j)=>`<i class="${exSets(Q.k,j)>=x[1]?"d":""} ${j==Q.i?"c":""}"></i>`).join("")}</div><b class="cnt">${Q.i+1}/${n}</b></div>
 <div class="stage ${an}"><svg id="fg" viewBox="0 0 220 150"></svg>${Q.i>0?`<button class="nav l" onclick="go(-1)">${I("l")}</button>`:""}${!last?`<button class="nav r" onclick="go(1)">${I("r")}</button>`:""}</div>
-<div class="info ${an}"><h2 class="en">${e[0]}</h2><div class="pill">${e[1]} × ${e[2]}</div><p class="tip">${e[3]}</p><div class="dots">${Array.from({length:e[1]},(_,j)=>`<span class="dt ${j<c?"on":""}">${j<c?I("check",22):j+1}</span>`).join("")}</div></div>
-<button class="btn ${f?"":"pulse"}" onclick="setDone()">${f?(last?I("trophy",22)+" Terminer":"Exo suivant "+I("r",20)):I("check",22)+(e[1]==1?" C’est fait":" Série "+(c+1)+" faite")}</button></div>`;
+<div class="info ${an}"><h2 class="en">${e[0]}</h2><div class="pill">${e[1]} × ${e[2]}</div><p class="tip">${e[3]}</p>${LOAD.includes(e[4])?`<div class="wt"><button onclick="wt(-1)">−</button><b>${gw(e)} kg</b><button onclick="wt(1)">+</button><small>par haltère</small></div>`:""}<div class="dots">${Array.from({length:e[1]},(_,j)=>`<span class="dt ${j<c?"on":""}">${j<c?I("check",22):j+1}</span>`).join("")}</div></div>
+<button class="btn ${f?"":"pulse"}" onclick="setDone()">${f?(last?I("trophy",22)+" Terminer":"Exo suivant "+I("r",20)):I("check",22)+(dur(e)?" Chrono "+dur(e)+" s":e[1]==1?" C’est fait":" Série "+(c+1)+" faite")}</button></div>`;
  if(Q.rest>0){const nx=Q.nx&&p.ex[Q.i+1]?p.ex[Q.i+1][0]:null;
-  h+=`<div class="rest"><div class="lbl">Repos</div><div class="ring"><svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="54"/><circle id="rc" class="fg" cx="60" cy="60" r="54" style="stroke-dashoffset:${(1-Q.rest/Q.rt)*339}"/></svg><b id="rn">${Q.rest}</b></div><div>${nx?"Ensuite : <b>"+nx+"</b>":"Respire, prépare la série suivante"}</div><div class="rb"><button class="btn sm" onclick="addR()">+15 s</button><button class="btn sm k" onclick="endRest()">Passer</button></div></div>`}
+  h+=`<div class="rest"><div class="lbl">${Q.tm?"Go !":"Repos"}</div><div class="ring"><svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="54"/><circle id="rc" class="fg" cx="60" cy="60" r="54" style="stroke-dashoffset:${(1-Q.rest/Q.rt)*339}"/></svg><b id="rn">${Q.rest}</b></div><div>${Q.tm?"Tiens la position, respire":nx?"Ensuite : <b>"+nx+"</b>":"Respire, prépare la série suivante"}</div><div class="rb"><button class="btn sm" onclick="addR()">+15 s</button><button class="btn sm k" onclick="endRest()">Passer</button></div></div>`}
  return h}
 function finHTML(){setCur(null);const s=streak(),cs=["#ffd60a","#ff5a36","#fff","#9db4ff","#7ee2a8"];
  return `<div class="fin">${Array.from({length:26},(_,i)=>{const r=Math.random();return `<i class="cf" style="left:${Math.round(r*100)}%;background:${cs[i%5]};animation-duration:${(2+Math.random()*2).toFixed(2)}s;animation-delay:${(-Math.random()*3).toFixed(2)}s"></i>`}).join("")}<div class="tro">${I("trophy",110)}</div><h2 class="h">Séance<br>terminée !</h2><div class="big">${s}${I("flame",44)}</div><div>jour${s>1?"s":""} de série · reviens demain</div><button class="btn" style="max-width:340px;background:#fff" onclick="quit()">Continuer</button></div>`}
 
+const mascot=ok=>`<svg viewBox="0 0 220 150" class="mas"><ellipse cx="110" cy="138" rx="44" ry="6" fill="#0002"/><g class="mb"><g class="ma"><path d="M146 88q16 4 20 16" fill="none" stroke="#16161d" stroke-width="12" stroke-linecap="round"/><path d="M146 88q16 4 20 16" fill="none" stroke="#ffd23f" stroke-width="6" stroke-linecap="round"/><rect x="150" y="104" width="34" height="11" rx="4" fill="#ff6b4a" stroke="#16161d" stroke-width="3.5"/><rect x="146" y="98" width="9" height="23" rx="3" fill="#16161d"/><rect x="179" y="98" width="9" height="23" rx="3" fill="#16161d"/></g><path d="M74 96q-18 2-22 18" fill="none" stroke="#16161d" stroke-width="12" stroke-linecap="round"/><path d="M74 96q-18 2-22 18" fill="none" stroke="#ffd23f" stroke-width="6" stroke-linecap="round"/><ellipse cx="92" cy="132" rx="14" ry="7" fill="#16161d"/><ellipse cx="128" cy="132" rx="14" ry="7" fill="#16161d"/><ellipse cx="110" cy="84" rx="42" ry="46" fill="#ffd23f" stroke="#16161d" stroke-width="4.5"/><ellipse cx="110" cy="100" rx="26" ry="24" fill="#fff3b0"/><path d="M69 62q41-12 82 0v11q-41-12-82 0z" fill="#ff6b4a" stroke="#16161d" stroke-width="3.5" stroke-linejoin="round"/><path d="M151 64l16-6M151 70l16 8" stroke="#ff6b4a" stroke-width="5" stroke-linecap="round"/>${ok?`<path d="M90 84q7-9 14 0M116 84q7-9 14 0" fill="none" stroke="#16161d" stroke-width="4" stroke-linecap="round"/>`:`<g class="ey"><circle cx="96" cy="83" r="9" fill="#fff" stroke="#16161d" stroke-width="3"/><circle cx="124" cy="83" r="9" fill="#fff" stroke="#16161d" stroke-width="3"/><circle cx="98" cy="85" r="4.5" fill="#16161d"/><circle cx="126" cy="85" r="4.5" fill="#16161d"/></g>`}<ellipse cx="82" cy="98" rx="6" ry="4" fill="#ff6b4a" opacity=".45"/><ellipse cx="138" cy="98" rx="6" ry="4" fill="#ff6b4a" opacity=".45"/><path d="${ok?"M96 100q14 18 28 0z":"M100 102q10 8 20 0"}" fill="${ok?"#fff":"none"}" stroke="#16161d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></g></svg>`;
 /* ---------- écrans ---------- */
 function setCur(m){if(m!==cur){cur=m;T0=performance.now()}}
 function home(){const n=today(),k=key(n),d=n.getDay(),s=streak(),g=nextGoal(),p=P[d],dn=!!S.done[k],gv=g?Math.min(g[2](),g[3]):0;
- setCur(M[p.ex[0][4]]);
+ setCur(null);
  return `<div class="view ${F()}"><div class="hd"><div class="mu" id="clk">${dateStr()}</div><h1 class="h">Prêt à suer ?</h1></div>
 ${due()?`<div class="ban box">${I("bell",20)}<span>C’est l’heure : ${p.n.toLowerCase()}</span></div>`:""}
-<div class="box stage"><svg id="fg" viewBox="0 0 220 150"></svg><span class="chip a">${DAYS[d]} · ${p.n}</span><span class="chip b">${p.ex[0][0]}</span>${dn?`<button class="chip c" onclick="undo()">${I("undo",13)} annuler</button>`:""}</div>
+<div class="box stage mst">${mascot(dn)}<span class="chip a">${DAYS[d]} · ${p.n}</span><div class="bub">${dn?"Bravo, séance validée !":s?"Garde ta série, "+s+" j !":"Allez, on commence !"}</div>${dn?`<button class="chip c" onclick="undo()">${I("undo",13)} annuler</button>`:""}</div>
 <div class="st"><div class="box s1"><b>${s}${I("flame",22)}</b><span>jour${s>1?"s":""} de série</span></div><div class="box s2"><b>${weekDone()}/7</b><span>cette semaine</span></div><div class="box s3"><b>${gv}/${g?g[3]:"–"}</b><span>${g?"Objectif : "+g[1]:"Tout est fait !"}</span></div></div>
 <div class="week">${weekDates().map(x=>{const kk=key(x);return `<div class="day ${S.done[kk]?"done":""} ${kk==k?"today":""}" onclick="start(${x.getDay()},'${kk}')">${SH[x.getDay()]}<b>${x.getDate()}</b></div>`}).join("")}</div>
 <button class="btn ${dn?"":"pulse"}" onclick="start(${d},'${k}')">${dn?I("check")+" Revoir la séance":I("play",20)+" Lancer la séance"}</button></div>`}
 function seances(){setCur(null);const tk=key(today());
  return `<div class="view ${F()}"><div class="hd"><h1 class="h">Séances</h1><div class="mu">Touche une séance pour la lancer</div></div><div class="list">${weekDates().map(x=>{const kk=key(x),d=x.getDay(),pr=sessProg(kk,d),pc=S.done[kk]?100:Math.round(pr[0]/pr[1]*100);
-  return `<div class="box tap row ${kk==tk?"td":""}" style="--p:${pc}%" onclick="start(${d},'${kk}')"><div><b>${DAYS[d]}</b><small>${P[d].n}</small></div><div class="rw2">${S.done[kk]?I("check",24):pr[0]+"/"+pr[1]}</div></div>`}).join("")}</div></div>`}
+  return `<div class="box tap row ${kk==tk?"td":""}" style="--p:${pc}%" onclick="start(${d},'${kk}')"><div><b>${DAYS[d]}</b><small>${P[d].n} · ${P[d].ex.length} exos</small></div><div class="rw2">${S.done[kk]?I("check",24):pr[0]+"/"+pr[1]}</div></div>`}).join("")}</div></div>`}
 function goals(){setCur(null);const np="Notification" in window?Notification.permission:"off";
  return `<div class="view ${F()}"><div class="hd"><h1 class="h">Objectifs</h1><div class="mu">Série ${streak()} · Record ${best()} · Séances ${total()}</div></div>
 <div class="meds">${GOALS.map(g=>{const v=g[2](),got=v>=g[3];return `<div class="med ${got?"got":""}"><div class="mt"><span class="ic">${I(g[0],20)}</span><b>${g[1]}</b></div><div class="mu">${Math.min(v,g[3])}/${g[3]}</div>${bar(Math.min(v,g[3])/g[3])}</div>`}).join("")}</div>
